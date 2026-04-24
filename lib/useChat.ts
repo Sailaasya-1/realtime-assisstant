@@ -23,10 +23,7 @@ export function useChat(getTranscript: () => string) {
   // Function to send a user message and get assistant response
   const sendMessage = useCallback(async (userText: string) => {
     const settings = loadSettings();
-    if (!settings.groqApiKey) {
-      alert("Please add your Groq API key in Settings.");
-      return;
-    }
+    
      
     // Add user message to chat
     const userMsg: ChatMessage = {
