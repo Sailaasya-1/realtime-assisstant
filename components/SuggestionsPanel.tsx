@@ -21,45 +21,37 @@ export default function SuggestionsPanel({ onSuggestionClick }: Props) {
   const [countdown, setCountdown] = useState(30);
   const prevBatchCount = useRef(0);
   const hasStarted = useRef(false);
+  const isRecording = useStore((s) => s.isRecording);
 
   const handleRefresh = useCallback(() => {
-    fetchSuggestions();
+    fetchSuggestions(true);
     setCountdown(30);
   }, [fetchSuggestions]);
 
-  // Single countdown interval — starts once recording begins, never restarts
+  // Reset to 30 when new batch arrives
   useEffect(() => {
-    if (suggestionBatches.length === 0 || hasStarted.current) return;
-    hasStarted.current = true;
-
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          return 30;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
+    if (suggestionBatches.length > prevBatchCount.current) {
+      setCountdown(30);
+      prevBatchCount.current = suggestionBatches.length;
+    }
   }, [suggestionBatches.length]);
 
-  // Trigger fetch when countdown hits 1
+  // Tick only when recording AND at least one batch exists
   useEffect(() => {
-    if (countdown === 1 && suggestionBatches.length > 0 && !isFetching) {
-      fetchSuggestions();
-    }
-  }, [countdown]);
-
-  // Reset countdown when new batch arrives
-  // Always tick — regardless of batches
-  useEffect(() => {
+    if (!isRecording || suggestionBatches.length === 0) return;
     const timer = setInterval(() => {
       setCountdown((prev) => (prev <= 1 ? 30 : prev - 1));
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [isRecording, suggestionBatches.length]);
 
+  // Trigger fetch when countdown hits 1
+  useEffect(() => {
+    if (countdown === 1 && isRecording && !isFetching) {
+      fetchSuggestions(true);
+    }
+  }, [countdown]);
+  
   return (
     <div className="flex flex-col h-full p-4">
 
@@ -73,7 +65,7 @@ export default function SuggestionsPanel({ onSuggestionClick }: Props) {
           <span>↻</span>
           <span>{isFetching ? "Refreshing..." : "Reload suggestions"}</span>
         </button>
-        <span className="text-xs text-slate-400 px-2 py-1">
+        <span className="text-xs text-slate-400 bg-slate-800 px-2 py-1 rounded-md tabular-nums">
           {suggestionBatches.length === 0 ? "auto-refresh in 30s" : `auto-refresh in ${countdown}s`}
         </span>
       </div>

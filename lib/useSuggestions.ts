@@ -15,28 +15,27 @@ export function useSuggestions() {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const fetchSuggestionsRef = useRef<(() => Promise<void>) | null>(null);
   const hasStarted = useRef(false);
+  const lastTranscriptLength = useRef(0);
   
-  // Function to fetch suggestions from the backend API based on the current transcript and settings
-  const fetchSuggestions = useCallback(async () => {
-    console.log("=== fetchSuggestions called ===");
-    console.log("isFetching:", isFetching);
-    console.log("transcriptLines:", transcriptLines.length);
-    
+  const fetchSuggestions = useCallback(async (force = false) => {
     // Prevent multiple simultaneous fetches
-    if (isFetching) { console.log("BLOCKED: isFetching"); return; }
-    
-    // Load settings and check for required API key and transcript content before making the API call
+    if (isFetching) return;
+
+    // Skip if transcript hasn't grown — unless forced by reload button
+    if (!force && transcriptLines.length === lastTranscriptLength.current) return;
+    lastTranscriptLength.current = transcriptLines.length;
+
     const settings = loadSettings();
-    if (transcriptLines.length === 0) { console.log("BLOCKED: no transcript"); return; }
-    
-    // Prepare the transcript context for the API call by taking the last few lines based on settings
+    if (transcriptLines.length === 0) return;
+
+    // Prepare transcript context
     const transcriptText = transcriptLines
       .slice(-settings.suggestionContextLines)
       .map((line) => `${line.timestamp} ${line.text}`)
       .join("\n");
-    
-    setIsFetching(true);
 
+    setIsFetching(true);
+    
     // Make the API call to fetch suggestions based on the prepared transcript context and settings
     try {
       const res = await fetch("/api/suggestions", {
@@ -86,16 +85,18 @@ export function useSuggestions() {
     }
   }, [transcriptLines, isRecording]);
 
+
+
     // Stop when recording stops
-    useEffect(() => {
-      if (!isRecording) {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-          intervalRef.current = null;
-        }
-        hasStarted.current = false;
+  useEffect(() => {
+    if (!isRecording) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
-    }, [isRecording]);
+      hasStarted.current = false;
+    }
+  }, [isRecording]);
 
   // Reset when transcript cleared
   useEffect(() => {

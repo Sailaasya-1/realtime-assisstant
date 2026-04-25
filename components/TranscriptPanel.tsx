@@ -38,7 +38,7 @@ export default function TranscriptPanel({ onTranscriptUpdate }: { onTranscriptUp
       recorder.ondataavailable = (e) => chunks.push(e.data);
       recorder.onstop = async () => {
         const blob = new Blob(chunks, { type: "audio/webm" });
-        if (blob.size > 5000) await transcribeBlob(blob);
+        if (blob.size > 1000) await transcribeBlob(blob);
       };
 
       recorder.start();
@@ -51,7 +51,7 @@ export default function TranscriptPanel({ onTranscriptUpdate }: { onTranscriptUp
     intervalRef.current = setInterval(() => {
       mediaRecorderRef.current?.stop();
       startChunk();
-    }, 1000);
+    }, 3000);
   }
   
   // Stop recording and clear the interval
