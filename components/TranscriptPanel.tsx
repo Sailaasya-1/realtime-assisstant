@@ -98,15 +98,22 @@ export default function TranscriptPanel({ onTranscriptUpdate }: { onTranscriptUp
   return (
     <div className="flex flex-col h-full p-4">
 
-      {}
       <div className="flex items-center gap-3 mb-3 shrink-0">
         <button
           onClick={isRecording ? stopRecording : startRecording}
-          className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${
-            isRecording ? "bg-red-500" : "bg-blue-500"
+          className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors relative ${
+            isRecording ? "bg-red-500" : "bg-blue-600"
           }`}
         >
-          <span className="w-3 h-3 rounded-full bg-black" />
+          {isRecording && (
+            <>
+              <span className="absolute w-10 h-10 rounded-full bg-red-500 animate-ping opacity-50" />
+              <span className="absolute w-10 h-10 rounded-full bg-red-500 animate-ping opacity-30" />
+            </>
+          )}
+          <span className={`w-3 h-3 rounded-full relative z-10 ${
+            isRecording ? "bg-white" : "bg-black"
+          }`} />
         </button>
         <div className="flex flex-col">
           <span className="text-xs text-slate-500">
@@ -115,17 +122,16 @@ export default function TranscriptPanel({ onTranscriptUpdate }: { onTranscriptUp
         </div>
       </div>
 
-      {}
       <div className="border border-slate-700 rounded-lg p-3 mb-3 shrink-0">
         <p className="text-xs text-slate-400 leading-relaxed">
           The transcript scrolls and appends new chunks every ~30 seconds while recording. Use the mic button to start/stop. Include an export button (not shown) so we can pull the full session.
         </p>
       </div>
 
-      {}
-      <div ref={scrollRef} className="flex-1 space-y-2 pr-1">
+      {/* overflow-y-auto — scrollbar only appears when content exceeds height */}
+      <div ref={scrollRef} className={`flex-1 space-y-2 pr-1 ${transcriptLines.length > 0 ? "overflow-y-auto" : "overflow-hidden"}`}>
         {transcriptLines.length === 0 ? (
-          <div className="h-full flex justify-center mt-7 ">
+          <div className="h-full flex justify-center mt-7">
             <p className="text-slate-500 text-sm text-center">
               No transcript yet — start the mic.
             </p>
@@ -142,4 +148,4 @@ export default function TranscriptPanel({ onTranscriptUpdate }: { onTranscriptUp
 
     </div>
   );
-}
+  }

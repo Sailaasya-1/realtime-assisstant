@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
         model: "openai/gpt-oss-120b",
         max_tokens: 1000,
         temperature: 0.7,
+        stream : true,
         messages: [
           { role: "system", content: systemPrompt },
           ...messages,
@@ -46,13 +47,16 @@ export async function POST(req: NextRequest) {
       const err = await res.text();
       return NextResponse.json({ error: err }, { status: res.status });
     }
-    
-    // Extract the assistant's reply from the API response and return it to the frontend
-    const data = await res.json();
-    const content = data.choices[0].message.content;
-    return NextResponse.json({ content });
+
+
+    return new Response(res.body, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+    },
+  });
   } catch (err) {
-    console.error("Chat error:", err);
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    console.error("Chat API error:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

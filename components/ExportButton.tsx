@@ -55,8 +55,12 @@ export default function ExportButton({
 
   return (
     
-    <Button variant="outline" size="sm" onClick={handleExport}>
-      Export
+    <Button 
+      variant="outline" 
+      size="sm" 
+      onClick={handleExport}
+      className="text-slate-400"
+    > Export
     </Button>
   );
 }

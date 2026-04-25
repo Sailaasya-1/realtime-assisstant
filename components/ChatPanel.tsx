@@ -63,20 +63,22 @@ export default function ChatPanel({ getTranscript, pendingSuggestion, onSuggesti
               Click a suggestion or type a question below.
             </p>
           </div>
-
-
-    
-
-      
-          
-
+        
         )}
 
         {messages.map((msg, i) => (
           <div key={i} className={`flex flex-col gap-1 ${msg.role === "user" ? "items-end" : "items-start"}`}>
+            
+            {}
+            <span className="text-xs text-slate-500 uppercase tracking-wider">
+              {msg.role === "user" 
+                ? `You${msg.label ? ` · ${msg.label}` : ""}` 
+                : "Assistant"}
+            </span>
+
             <div className={`max-w-[90%] rounded-lg px-3 py-2 text-sm ${
               msg.role === "user"
-                ? "bg-indigo-600 text-white"
+                ? "bg-slate-800 text-slate-100"
                 : "bg-slate-800 text-slate-100"
             }`}>
               {msg.content ? (
@@ -106,7 +108,7 @@ export default function ChatPanel({ getTranscript, pendingSuggestion, onSuggesti
         <div ref={bottomRef} />
       </div>
 
-      {/* Fixed input */}
+      {}
       <div className="flex gap-2 shrink-0">
         <Input
           value={input}

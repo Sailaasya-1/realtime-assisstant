@@ -73,7 +73,7 @@ export default function SuggestionsPanel({ onSuggestionClick }: Props) {
           <span>↻</span>
           <span>{isFetching ? "Refreshing..." : "Reload suggestions"}</span>
         </button>
-        <span className="text-xs text-slate-400 bg-slate-800 px-2 py-1 rounded-md">
+        <span className="text-xs text-slate-400 px-2 py-1">
           {suggestionBatches.length === 0 ? "auto-refresh in 30s" : `auto-refresh in ${countdown}s`}
         </span>
       </div>
@@ -87,13 +87,22 @@ export default function SuggestionsPanel({ onSuggestionClick }: Props) {
 
       {}
       <div className="flex-1 overflow-y-auto space-y-5 pr-1">
-        {suggestionBatches.length === 0 ? (
+        {suggestionBatches.length === 0 && isFetching ? (
+          // Loading state — fetching first batch
+          <div className="flex justify-center mt-7">
+            <p className="text-slate-400 text-sm text-center animate-pulse">
+              Generating suggestions...
+            </p>
+          </div>
+        ) : suggestionBatches.length === 0 ? (
+          // Empty state — not yet started
           <div className="flex justify-center mt-7">
             <p className="text-slate-500 text-sm text-center">
               Suggestions appear here once recording starts.
             </p>
           </div>
         ) : (
+          // Batches — show all
           suggestionBatches.map((batch, index) => {
             const opacity = index === 0 ? "opacity-100" : index === 1 ? "opacity-60" : "opacity-40";
             return (

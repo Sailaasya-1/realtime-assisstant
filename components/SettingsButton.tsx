@@ -37,7 +37,7 @@ export default function SettingsButton() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="border-slate-700 text-slate-400 hover:text-slate-100">
+        <Button variant="outline" size="sm" className="border-slate-700 text-slate-400">
           ⚙ Settings
         </Button>
       </DialogTrigger>
@@ -78,7 +78,7 @@ export default function SettingsButton() {
 
         <div className="flex justify-end gap-2 pt-2">
           <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button onClick={handleSave} className="bg-indigo-600 hover:bg-indigo-700">
+          <Button onClick={handleSave} className="bg-indigo-600">
             Save Settings
           </Button>
         </div>
